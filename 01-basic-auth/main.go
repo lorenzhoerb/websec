@@ -25,11 +25,10 @@ var principalKey contextKey
 
 // Simple authenticate implementation.
 func authenticate(username, password string) (Principal, error) {
-	if username != "admin" && password != "admin" {
-		return Principal{}, errors.New("invalid credentials")
+	if username == "admin" && password == "admin" {
+		return Principal{Username: "admin"}, nil
 	}
-
-	return Principal{Username: "admin"}, nil
+	return Principal{}, errors.New("invalid credentials")
 }
 
 func extractCredentials(r *http.Request) (string, string, bool) {
@@ -54,8 +53,8 @@ func unauthorized(w http.ResponseWriter) {
 	http.Error(w, "Unauthorized", http.StatusUnauthorized)
 }
 
-func authenticated(next http.HandlerFunc) func(http.ResponseWriter, *http.Request) {
-	return func(w http.ResponseWriter, r *http.Request) {
+func authenticated(next http.Handler) http.Handler {
+	return http.HandlerFunc(func(w http.ResponseWriter, r *http.Request) {
 
 		username, password, ok := extractCredentials(r)
 		if !ok {
@@ -70,8 +69,8 @@ func authenticated(next http.HandlerFunc) func(http.ResponseWriter, *http.Reques
 		}
 
 		ctx := context.WithValue(r.Context(), principalKey, principal)
-		next(w, r.WithContext(ctx))
-	}
+		next.ServeHTTP(w, r.WithContext(ctx))
+	})
 }
 
 func private(w http.ResponseWriter, r *http.Request) {
@@ -95,7 +94,7 @@ func public(w http.ResponseWriter, r *http.Request) {
 
 func main() {
 
-	http.HandleFunc("GET /private", authenticated(private))
+	http.Handle("GET /private", authenticated(http.HandlerFunc(private)))
 	http.HandleFunc("GET /public", public)
 
 	log.Println("Listening on :8085")
