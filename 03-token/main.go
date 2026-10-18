@@ -34,7 +34,7 @@ var (
 	tokenMu    sync.Mutex
 )
 
-func (t TokenRecord) IsValid() bool {
+func (t TokenRecord) isExpired() bool {
 	return time.Now().Before(t.IssuedAt.Add(TTL))
 }
 
@@ -69,7 +69,7 @@ func lookupToken(token string) (TokenRecord, bool) {
 	if !ok {
 		return TokenRecord{}, false
 	}
-	if !record.IsValid() {
+	if record.isExpired() {
 		delete(tokenStore, key)
 		return TokenRecord{}, false
 	}
