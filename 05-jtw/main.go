@@ -180,7 +180,7 @@ func testRead(w http.ResponseWriter, r *http.Request) {
 	}
 
 	principal, _ := r.Context().Value(principalKey).(Principal)
-	fmt.Fprintf(w, "RED test: %s\n", principal.Username)
+	fmt.Fprintf(w, "READ test: %s\n", principal.Username)
 }
 
 func testWrite(w http.ResponseWriter, r *http.Request) {
