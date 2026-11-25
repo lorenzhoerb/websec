@@ -9,6 +9,7 @@ type Metadata struct {
 	Issuer                        string   `json:"issuer"`
 	AuthorizationEndpoint         string   `json:"authorization_endpoint"`
 	TokenEndpoint                 string   `json:"token_endpoint"`
+	JWKSURI                       string   `json:"jwks_uri"`
 	ResponseTypesSupported        []string `json:"response_types_supported"`
 	GrantTypesSupported           []string `json:"grant_types_supported"`
 	CodeChallengeMethodsSupported []string `json:"code_challenge_methods_supported"`
@@ -20,6 +21,7 @@ func MetadataHandler(issuer string) http.HandlerFunc {
 			Issuer:                        issuer,
 			AuthorizationEndpoint:         issuer + AuthorizeEndpoint,
 			TokenEndpoint:                 issuer + TokenEndpoint,
+			JWKSURI:                       issuer + JWKSEndpoint,
 			ResponseTypesSupported:        SupportedResponseTypes,
 			GrantTypesSupported:           SupportedGrantTypes,
 			CodeChallengeMethodsSupported: SupportedCodeChallengeMethods,

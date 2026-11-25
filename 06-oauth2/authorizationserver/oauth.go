@@ -4,6 +4,7 @@ const (
 	AuthorizeEndpoint = "/oauth2/authorize"
 	TokenEndpoint     = "/oauth2/token"
 	MetadataEndpoint  = "/.well-known/oauth-authorization-server"
+	JWKSEndpoint      = "/.well-known/jwks.json"
 )
 
 var (

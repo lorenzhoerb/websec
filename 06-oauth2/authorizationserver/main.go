@@ -13,12 +13,22 @@ func main() {
 	seedUsers()
 	seedClients()
 
+	signingKey, err := LoadSigningKey(config.SigningKeyPath)
+	if err != nil {
+		log.Fatalf("failed to load signing key: %v", err)
+	}
+	if config.SigningKeyPath == "" {
+		log.Println("no SIGNING_KEY_PATH set, generated a temporary signing key")
+	}
+	log.Printf("signing key kid: %s\n", signingKey.ID)
+
 	mux := http.NewServeMux()
 
 	// OAuth2 Endpoints
 	mux.HandleFunc("GET "+MetadataEndpoint, MetadataHandler(config.Issuer))
+	mux.HandleFunc("GET "+JWKSEndpoint, JWKSHandler(signingKey))
 	mux.HandleFunc("GET "+AuthorizeEndpoint, AuthorizeHandler)
-	mux.HandleFunc("POST "+TokenEndpoint, TokenHandler)
+	mux.HandleFunc("POST "+TokenEndpoint, TokenHandler(config.Issuer, signingKey))
 
 	// Authentication Endpoints
 	mux.HandleFunc("GET /login", LoginPage)

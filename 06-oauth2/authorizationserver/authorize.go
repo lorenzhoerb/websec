@@ -8,9 +8,11 @@ import (
 )
 
 const (
-	ErrInvalidRequest = "invalid_request"
-	ErrInvalidClient  = "invalid_client"
-	ErrServerError    = "server_error"
+	ErrInvalidRequest       = "invalid_request"
+	ErrInvalidClient        = "invalid_client"
+	ErrInvalidGrant         = "invalid_grant"
+	ErrUnsupportedGrantType = "unsupported_grant_type"
+	ErrServerError          = "server_error"
 )
 
 type AuthorizationRequest struct {
