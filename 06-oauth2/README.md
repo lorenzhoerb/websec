@@ -82,3 +82,17 @@ else valid session
     a->>a: consume code
     a->>c: return access_token
 end
+```
+
+## Authorization Server
+
+Test the authorization using [OAuth 2.0 Debugger](https://oauthdebugger.com/). 
+Enter following details:
+
+- **Authorize URI:** http://localhost:8085/oauth2/authorize
+- **Client ID**: oauth2-debugger
+- **Scope:** read:posts write:posts
+- **Use PKCE?** select
+- **Token URI:** http://localhost:8085/oauth2/token
+
+👉 Send Request

@@ -28,7 +28,8 @@ func main() {
 	mux.HandleFunc("GET "+MetadataEndpoint, MetadataHandler(config.Issuer))
 	mux.HandleFunc("GET "+JWKSEndpoint, JWKSHandler(signingKey))
 	mux.HandleFunc("GET "+AuthorizeEndpoint, AuthorizeHandler)
-	mux.HandleFunc("POST "+TokenEndpoint, TokenHandler(config.Issuer, signingKey))
+	mux.HandleFunc("POST "+TokenEndpoint, withCORS(TokenHandler(config.Issuer, signingKey)))
+	mux.HandleFunc("OPTIONS "+TokenEndpoint, withCORS(func(w http.ResponseWriter, r *http.Request) {}))
 
 	// Authentication Endpoints
 	mux.HandleFunc("GET /login", LoginPage)
@@ -40,6 +41,20 @@ func main() {
 	log.Println("Starting authorization server...")
 	log.Printf("listening on %s\n", addr)
 	http.ListenAndServe(addr, mux)
+}
+
+// Allow cors for testing with oauthdebugger.com
+func withCORS(next http.HandlerFunc) http.HandlerFunc {
+	return func(w http.ResponseWriter, r *http.Request) {
+		if r.Header.Get("Origin") == "https://oauthdebugger.com" {
+			w.Header().Set("Access-Control-Allow-Origin", "https://oauthdebugger.com")
+			w.Header().Set("Access-Control-Allow-Methods", "POST, OPTIONS")
+			w.Header().Set("Access-Control-Allow-Headers", "Content-Type")
+			w.Header().Set("Access-Control-Allow-Private-Network", "true")
+			w.Header().Set("Vary", "Origin")
+		}
+		next(w, r)
+	}
 }
 
 func seedUsers() {
@@ -57,7 +72,18 @@ func seedClients() {
 		AllowedScopes: []string{"read:posts", "write:posts"},
 	}
 	if err := RegisterClient(client); err != nil {
-		log.Fatal("failed to seed client: %v", client)
+		log.Fatalf("failed to seed client %s: %v", client.ID, err)
 	}
 	log.Printf("seeded client: %s\n", client.ID)
+
+	clientOAuthDebugger := Client{
+		ID:            "oauth2-debugger",
+		RedirectURIs:  []string{"https://oauthdebugger.com/debug"},
+		Enabled:       true,
+		AllowedScopes: []string{"read:posts", "write:posts"},
+	}
+	if err := RegisterClient(clientOAuthDebugger); err != nil {
+		log.Fatalf("failed to seed client %s: %v", clientOAuthDebugger.ID, err)
+	}
+	log.Printf("seeded client: %s\n", clientOAuthDebugger.ID)
 }

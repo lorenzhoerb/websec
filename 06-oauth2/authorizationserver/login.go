@@ -59,9 +59,8 @@ func LoginSubmitHandler(w http.ResponseWriter, r *http.Request) {
 	http.SetCookie(w, &http.Cookie{
 		Name:     SessionCookieName,
 		Value:    sessionID,
-		Domain:   "/",
 		Path:     "/",
-		MaxAge:   int(SessionTTL),
+		MaxAge:   int(SessionTTL.Seconds()),
 		HttpOnly: true,
 		SameSite: http.SameSiteLaxMode,
 	})
