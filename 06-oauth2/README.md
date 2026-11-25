@@ -96,3 +96,24 @@ Enter following details:
 - **Token URI:** http://localhost:8085/oauth2/token
 
 👉 Send Request
+
+You will see the authorization code and the access token. 
+
+### Verify Access Token
+
+1. Go to [jwt.io](jwt.io).
+2. Paste the access token into JWT field.
+3. In section **JWT Signuature Verification** select Public Key Format `JWK`.
+3. Go to [http://localhost:8085/.well-known/jwks.json](http://localhost:8085/.well-known/jwks.json) (there should only be one key).
+4. Copy the key object and past into `Public Key` field.
+```json
+{
+    "kty": "RSA",
+    "use": "sig",
+    // ... 
+}
+```
+
+👉 On the bottom of the JWT Field it should show:
+- ✅ Valid JWT
+- ✅ Signature Verified
